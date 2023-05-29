@@ -11,7 +11,6 @@ body {
     height: 100vh;
     top: 0;
     left: 0;
-    background-color: aqua;
 }
 
 /*-----------options------------*/
@@ -53,6 +52,7 @@ body {
     width: 100%;
     padding: 3px 20px;
 }
+
 /*----------host---------------*/
 .host {
     display: flex;
@@ -79,4 +79,36 @@ body {
 .host-box>button {
     padding: 3px 20px;
     width: 100%;
+}
+
+/*---------lobby-----------*/
+.lobby {
+    display: flex;
+    flex-direction: column;
+}
+
+.item {
+    padding: 5px;
+    box-shadow: 0px 0px 2px 2px rgba(190, 190, 189, 0.5);
+}
+
+.item:hover {
+    background-color: aliceblue;
+}
+
+.lobby-list {
+   
+    
+}
+
+.lobby-list-main {
+    display: flex;
+    gap: 2px;
+    flex-direction: column;
+    padding: 5px;
+}
+.lobby-title{
+    font-size: 20px;
+    padding: 4px 0px;
+    text-align: center;
 }

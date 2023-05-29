@@ -1,16 +1,22 @@
 import { useState } from "react"
 import { useNavigate } from "react-router"
+import { Utils } from "../Utils"
 
 export default function Join() {
 
     const navigate = useNavigate()
     const [name, setName] = useState("")
     const [roomName, setRoomName] = useState("")
-    function handleJoin() {
+    async function handleJoin() {
         if (name.trim().length == 0 || roomName.trim().length == 0) {
             alert("input can't be empty")
         }
-        navigate("/room", { state: { name, roomName, isHost: false } })
+        //check if room exist or not
+        const { error, result } = await Utils.getJson("room/" + roomName)
+        if (result) {
+            return navigate("/room", { state: { name, roomName, isHost: false } })
+        }
+        return alert(roomName+" not exist")
     }
 
     return (

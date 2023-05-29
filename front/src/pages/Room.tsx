@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router";
 import Lobby from "../components/Lobby";
 import Game from "../components/Game";
 import { Player, Utils } from "../Utils";
-import SocketHandler from "../SocketHandler";
+import SocketHandler, { EventCallback } from "../SocketHandler";
 
 export default function Room() {
     const { state } = useLocation()
@@ -28,27 +28,41 @@ export default function Room() {
             _socketHandler = new SocketHandler(Utils.env.SOCKET_URL)
             setSocketHandler(_socketHandler)
         }
-        console.log("room open")
+        // console.log("room open")
 
         return () => {
             if (_socketHandler) {
                 setTimeout(() => {
                     _socketHandler.close()
-                }, 50);
+                }, 100);
             }
-            console.log("room close", _socketHandler)
+            // console.log("room close", _socketHandler)
         }
     }, [])
 
     useEffect(() => {
+        let callback: EventCallback
         if (socketHandler && player) {
-            socketHandler.setOnConnectedListener(() => {
-                if (player.isHost) {
-                    socketHandler.createRoom(player)
-                } else {
-
+            callback = socketHandler.setOnEventCallbackListener({
+                onConnected: async () => {
+                    if (player.isHost) {
+                        socketHandler.createRoom(player)
+                    } else {
+                        //if room exist
+                        const { error, result } = await Utils.getJson("room/" + player.roomID)
+                        if (result) {
+                            return socketHandler.joinRoom(player)
+                        }
+                        return navigate("/join")
+                    }
                 }
+
             })
+        }
+        return () => {
+            if (callback && socketHandler) {
+                socketHandler.removeOnEventCallbackListener(callback)
+            }
         }
     }, [socketHandler, player])
     return (
