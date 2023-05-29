@@ -7,7 +7,7 @@ export namespace Utils {
     }
     const SERVER_URL = env.SERVER_URL
     export async function getJson(url: string, query: string = "") {
-        
+
         var requestOptions: RequestInit = {
             method: 'GET',
             redirect: 'follow'
@@ -30,4 +30,10 @@ export interface Player {
     name: string,
     playerID: string
     roomID: string
+}
+export interface GameObject {
+    id: string,
+    x: number,
+    y: number,
+    color: string,
 }

@@ -11,11 +11,11 @@ export default function Host() {
             return alert("input can't be empty")
         }
         //check if room exist or not
-        const { error, result } = await Utils.getJson("room/" + roomName)
-        if (result) {
-            return alert("room name already exist")
+        const { error, result } = await Utils.getJson("room/exist/" + roomName)
+        if (error) {
+            return navigate("/room", { state: { name, roomName, isHost: true } })
         }
-        navigate("/room", { state: { name, roomName, isHost: true } })
+        return alert(roomName+" already exist")
     }
 
     return (

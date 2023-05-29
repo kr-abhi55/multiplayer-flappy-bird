@@ -20,11 +20,23 @@ const socketHandler = new SocketHandler(server)
 app.get("/room", (req, res) => {
     res.json({ rooms: getRooms() })
 })
-app.get("/room/:id", (req, res) => {
+app.get("/room/exist/:id", (req, res) => {
     const id = req.params.id
-    console.log("id",id)
+    console.log("id", id)
     const room = socketHandler.rooms.get(id)
     if (room) {
+        return res.json({ result: "success" })
+    }
+    res.status(400).json({ error: "room not exist" })
+})
+app.get("/room/can-join/:id", (req, res) => {
+    const id = req.params.id
+    console.log("id", id)
+    const room = socketHandler.rooms.get(id)
+    if (room) {
+        if (room.isBusy) {
+            return res.status(400).json({ error: "room is busy" })
+        }
         return res.json({ result: "success" })
     }
     res.status(400).json({ error: "room not exist" })

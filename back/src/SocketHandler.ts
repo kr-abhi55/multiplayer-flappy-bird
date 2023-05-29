@@ -7,8 +7,11 @@ room
 game
     update/go delete/go 
  */
-type MessageType = "create/room" | "join/room" | "room/closed" | "get/rooms" | "go/add" | "go/update" | "go/delete" |
-    "remove-player" | "add-player"
+type MessageType = "create/room" | "join/room" | "dis-join/room" | "room/closed" | "get/rooms" |
+    "remove-player" | "add-player" |
+    "before/game/start" | "game/start" | "game/end" |
+    "go/add" | "go/update" | "go/remove" |
+    "game/action"
 interface Player {
     name: string,
     playerID: string,
@@ -21,6 +24,7 @@ function playerWithoutWs(player: Player) {
 }
 class Room {
     players: Player[] = []
+    isBusy = false
     constructor(
         public roomID: string,
         public host: Player
@@ -90,6 +94,7 @@ export default class SocketHandler {
         this.wss.on('connection', (ws) => {
             let player_id: string = ""
             let room_id: string = ""
+            let is_host = false
             //console.log("connected")
             ws.on('message', async (message) => {
                 const { type, data }: { type: MessageType, data: any } = JSON.parse(message.toString('utf-8'))
@@ -100,6 +105,7 @@ export default class SocketHandler {
                     this.rooms.set(roomID, room)
                     player_id = playerID
                     room_id = roomID
+                    is_host = true
                     this.sendMessage(ws, type, {})
                 } else if (type == 'join/room') {
                     const { playerID, roomID, name } = data
@@ -111,7 +117,54 @@ export default class SocketHandler {
                         this.sendMessage(ws, type, room.getAllPlayer())
                         room.addPlayer({ isHost: false, playerID: playerID, name: name, ws: ws })
                     }
-                    console.log("joined ",room?.getPlayerBy(playerID)?.name)
+                    console.log("joined ", room?.getPlayerBy(playerID)?.name)
+                } else if (type == 'before/game/start') {
+                    //send to all player except host
+                    const room = this.rooms.get(room_id)
+                    if (room) {
+                        //send all other player + host except itself
+                        room.sendToAll(type, data, "", false)
+                    }
+                } else if (type == 'game/start') {
+                    //only send by host
+                    if (is_host) {
+                        const room = this.rooms.get(room_id)
+                        if (room) {
+                            room.isBusy=true
+                            room.sendToAll(type, data, "", false)
+                        }
+                    }
+
+                }
+                else if (type == 'game/end') {
+                    //only send by host
+                    if (is_host) {
+                        const room = this.rooms.get(room_id)
+                        if (room) {
+                            room.isBusy=false
+                            room.sendToAll(type, data, "", false)
+                        }
+                    }
+
+                }
+                else if (type == 'game/action') {
+                    const room = this.rooms.get(room_id)
+                    if (room) {
+                        data.playerID = player_id
+                        this.sendMessage(room.host.ws, type, data)
+                    }
+
+                }
+                else if (type == 'go/update') {
+                    console.log(type)
+                    //only host can send
+                    if (is_host) {
+                        //send to all players
+                        const room = this.rooms.get(room_id)
+                        if (room) {
+                            room.sendToAll(type, data, "", false)
+                        }
+                    }
                 }
             });
 
@@ -126,7 +179,7 @@ export default class SocketHandler {
                         room.close()
                     } else {
                         // ws is player
-                        console.log("dis-joined",room?.getPlayerBy(player_id)?.name)
+                        console.log("dis-joined", room?.getPlayerBy(player_id)?.name)
                         room.removePlayer(player_id)
 
                     }

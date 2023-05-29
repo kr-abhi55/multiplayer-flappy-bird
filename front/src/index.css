@@ -96,10 +96,7 @@ body {
     background-color: aliceblue;
 }
 
-.lobby-list {
-   
-    
-}
+.lobby-list {}
 
 .lobby-list-main {
     display: flex;
@@ -107,8 +104,17 @@ body {
     flex-direction: column;
     padding: 5px;
 }
-.lobby-title{
+
+.lobby-title {
     font-size: 20px;
     padding: 4px 0px;
     text-align: center;
+}
+
+.game-panel {
+    z-index: 10;
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 5px;
 }

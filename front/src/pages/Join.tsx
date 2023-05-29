@@ -12,11 +12,11 @@ export default function Join() {
             alert("input can't be empty")
         }
         //check if room exist or not
-        const { error, result } = await Utils.getJson("room/" + roomName)
+        const { error, result } = await Utils.getJson("room/can-join/" + roomName)
         if (result) {
             return navigate("/room", { state: { name, roomName, isHost: false } })
         }
-        return alert(roomName+" not exist")
+        alert(roomName + " " + error)
     }
 
     return (

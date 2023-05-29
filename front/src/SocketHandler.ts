@@ -1,7 +1,11 @@
 import { Player } from "./Utils";
 
-type MessageType = "create/room" | "join/room" | "dis-join/room" | "room/closed" | "get/rooms" | "go/add" | "go/update" | "go/delete" |
-    "remove-player" | "add-player"
+type MessageType = "create/room" | "join/room" | "dis-join/room" | "room/closed" | "get/rooms" |
+    "remove-player" | "add-player" |
+    "before/game/start" | "game/start" | "game/end" |
+    "go/add" | "go/update" | "go/remove" |
+    "game/action"
+export type ActionType = "set_pos" | "set_color"
 type Fun = () => void
 type Fun1 = (data: any) => void
 export interface EventCallback {
@@ -13,6 +17,14 @@ export interface EventCallback {
     onRoomClosed?: Fun
     onAddPlayer?: Fun1
     onRemovePlayer?: Fun1
+
+    onBeforeGameStart?: Fun1
+    onGameStart?: Fun1 //all gameObject
+    onGameEnd?: Fun
+    onAddGameObject?: Fun1
+    onRemoveGameObject?: Fun1
+    onUpdateGameObject?: Fun1
+    onGameAction?: Fun1
 
 }
 export default class SocketHandler {
@@ -28,7 +40,6 @@ export default class SocketHandler {
         });
         this.wSocket.addEventListener('message', (e) => {
             const { type, data } = JSON.parse(e.data);
-            console.log(type)
             this.handleMessage(type, data)
         })
         this.wSocket.addEventListener('close', () => {
@@ -69,6 +80,32 @@ export default class SocketHandler {
                 e.onRemovePlayer?.(data)
             })
         }
+        else if (type == 'before/game/start') {
+            this._eventCallbacks.forEach((e) => {
+                e.onBeforeGameStart?.(data)
+            })
+        }
+        else if (type == 'game/start') {
+            this._eventCallbacks.forEach((e) => {
+                e.onGameStart?.(data)
+            })
+        }
+        else if (type == 'game/end') {
+            this._eventCallbacks.forEach((e) => {
+                e.onGameEnd?.()
+            })
+        }
+        else if (type == 'game/action') {
+            this._eventCallbacks.forEach((e) => {
+                e.onGameAction?.(data)
+            })
+        }
+        else if (type == 'go/update') {
+            this._eventCallbacks.forEach((e) => {
+                e.onUpdateGameObject?.(data)
+            })
+        }
+
     }
     constructor(url: string) {
         this.wSocket = new WebSocket(url)
@@ -96,6 +133,12 @@ export default class SocketHandler {
     }
     sendMessage(type: MessageType, data: any) {
         this.wSocket.send(JSON.stringify({ type, data }))
+    }
+    sendAction(actionType: ActionType, data: any) {
+        this.sendMessage("game/action", {
+            type: actionType,
+            data: data
+        })
     }
 
 }
