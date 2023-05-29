@@ -65,12 +65,16 @@ export default function Room() {
             }
         }
     }, [socketHandler, player])
+    function handleStart() {
+        alert("starting ...")
+        setIsLobby(false)
+    }
     return (
         <div className="full">
 
             {(state && player && socketHandler) &&
                 ((isLobby) ?
-                    <Lobby player={player} socket={socketHandler} />
+                    <Lobby onStart={handleStart} player={player} socket={socketHandler} />
                     :
                     <Game player={player} socket={socketHandler} />)
             }
