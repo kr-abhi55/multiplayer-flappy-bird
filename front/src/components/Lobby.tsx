@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import SocketHandler, { EventCallback } from "../SocketHandler";
 import { Player, Utils } from "../Utils";
+import { useNavigate } from "react-router";
 
 export interface LobbyProps {
     player: Player
@@ -14,6 +15,8 @@ function Item({ player, isSelf }: { player: Player, isSelf: boolean }) {
 }
 export default function Lobby(props: LobbyProps) {
     const [players, setPlayers] = useState<Player[]>([])
+    const navigate = useNavigate()
+
     useEffect(() => {
         let callback: EventCallback
         if (props.player.isHost) {
@@ -43,6 +46,10 @@ export default function Lobby(props: LobbyProps) {
                     console.log("joined", data)
                     setPlayers(data)
                 },
+                onRoomClosed() {
+                    alert("room closed")
+                    navigate("/")
+                },
                 onDisJoinedRoom() {
                     console.log("dis-joined")
                 },
@@ -66,12 +73,14 @@ export default function Lobby(props: LobbyProps) {
             }
         }
     }, [])
-    function click() {
-
-    }
     return (
         <div className="full lobby" >
             <div className="lobby-header">
+                {props.player.isHost && (
+                    <div>
+                        <button onClick={props.onStart}>Start</button>
+                    </div>
+                )}
                 <div className="lobby-title">
                     {props.player.isHost ? "Host" : "Player"}
                 </div>
