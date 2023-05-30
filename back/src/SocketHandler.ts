@@ -130,7 +130,7 @@ export default class SocketHandler {
                     if (is_host) {
                         const room = this.rooms.get(room_id)
                         if (room) {
-                            room.isBusy=true
+                            room.isBusy = true
                             room.sendToAll(type, data, "", false)
                         }
                     }
@@ -141,7 +141,7 @@ export default class SocketHandler {
                     if (is_host) {
                         const room = this.rooms.get(room_id)
                         if (room) {
-                            room.isBusy=false
+                            room.isBusy = false
                             room.sendToAll(type, data, "", false)
                         }
                     }

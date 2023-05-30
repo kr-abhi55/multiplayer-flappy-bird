@@ -1,0 +1,172 @@
+#---------Rules--------------------
+player :
+    -it just send action(jump,move_left,move_right,move_dir,stop_move) to server
+    -can be stop by server
+    -add/update/remove gameObject
+    -
+host :
+    -all gameObject is dynamic
+    -every gameObject data is send to all player for update
+    -runs physics engine
+    -send message to specific player like  wait for play
+    -add/update/remove gameObject
+
+#---------Server--------------------
+Player
+    name id roomID
+Room
+    data:
+        players:Player[]
+        wsPlayerMap:Map<string,WebSocket>
+        isBusy
+        roomID 
+        host:Player
+    fun:
+        addPlayer(player)
+        removePlayer(playerID)
+        sendMsgToAll(type,data,exceptID,toHost)
+        sendMsgToHost(type,data)
+        _sendMsg(ws,type,data)
+        close
+        getAllPlayer()
+        getPlayerByID(playerID)
+        toString()
+
+
+ServerSocket 
+    data:
+        wss
+        rooms: Map<string,Room> #roomID,Room
+    MessageType
+
+        create/room 
+            request: {goID,playerID,roomID,name}
+        join/room
+            request: {goID,playerID,roomID,name}
+        #send by host to player
+        game/start #to all player
+            request: GameObject[]
+        game/end #to all player
+        game/wait #to a player
+        
+        go/update #to all player
+            request: GameObject[]
+        go/add #to all player
+            request: GameObject
+        go/remove #to all player
+            request:goID
+        #send by player
+        game/action #to to host
+            request: {data}
+        #send by room to player
+    fun:
+       # sendMessage(ws,type,data)
+    callback:
+        onConnected()
+        onDisConnected(serverInfo)
+        onMessage(serverInfo,message)
+        onHostMessage(serverInfo,message)
+        onPlayerMessage(serverInfo,message)
+
+    
+
+#----------Client-----------
+#Player
+MessageType
+    #receive
+        connected
+        disConnected
+        
+        joinedRoom
+        disJoinedRoom
+
+        addPlayer
+        removePlayer
+
+        gameStart
+        gameEnd
+
+        goAdd
+        goRemove
+        goUpdate
+    #send
+        gameAction
+
+#Host
+MessageType
+    #receive
+        connected
+        disConnected
+        
+        roomCreated
+        roomClosed
+
+        addPlayer
+        removePlayer
+
+        onGameAction
+    #send
+        goAdd
+        goUpdate
+        goRemove
+
+        gameStart
+        gameEnd
+
+#Page
+Option
+    Host
+        HostRoom
+            child: HostLobby HostGame
+    Join
+        JoinRoom
+            child: JoinLobby JoinGame
+#interface
+Player
+    name id  roomID
+#Socket
+SocketHandler
+    fun:
+        onMessage(type,data)
+        sendMessage(type,data)
+        close
+        #callback
+        onConnected
+        onDisConnected
+
+        onAddPlayer
+        onRemovePlayer
+
+JoinSocketHandler : SocketHandler
+    fun:
+        joinRoom(player)
+        #send
+        sendAction
+        #callback
+        joinedRoom
+        disJoinedRoom
+
+        addPlayer
+        removePlayer
+
+        gameStart
+        gameEnd
+
+        goAdd
+        goRemove
+        goUpdate
+
+HostSocketHandler : SocketHandler
+    fun:
+        createRoom(player)
+        #callback
+        connected
+        disConnected
+        
+        roomCreated
+        roomClosed
+
+        addPlayer
+        removePlayer
+
+        onGameAction
