@@ -1,3 +1,4 @@
+/*
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import Lobby from "../components/Lobby";
@@ -215,3 +216,5 @@ export default function Room() {
         </div>
     );
 }
+
+*/

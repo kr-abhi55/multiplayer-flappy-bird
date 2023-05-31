@@ -1,6 +1,7 @@
+/*
 import { useEffect, useRef } from "react";
 import SocketHandler, { ActionType } from "../SocketHandler";
-import { GameObject, Player } from "../Utils";
+import { GameObject, Player } from "../ts/Utils";
 
 export interface GameProps {
     onGameEnd: () => void
@@ -63,3 +64,4 @@ export default function Game(props: GameProps) {
         </div>
     );
 }
+*/

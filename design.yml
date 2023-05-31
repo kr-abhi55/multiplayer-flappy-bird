@@ -44,20 +44,20 @@ ServerSocket
         join/room
             request: {goID,playerID,roomID,name}
         #send by host to player
-        game/start #to all player
-            request: GameObject[]
-        game/end #to all player
-        game/wait #to a player
-        
-        go/update #to all player
-            request: GameObject[]
-        go/add #to all player
-            request: GameObject
-        go/remove #to all player
-            request:goID
+            game/start #to all player
+                request: GameObject[]
+            game/end #to all player
+            game/wait #to a player
+            
+            go/update #to all player
+                request: GameObject[]
+            go/add #to all player
+                request: GameObject
+            go/remove #to all player
+                request:goID
         #send by player
-        game/action #to to host
-            request: {data}
+            game/action #to to host
+                request: {data}
         #send by room to player
     fun:
        # sendMessage(ws,type,data)
@@ -125,7 +125,7 @@ Option
 Player
     name id  roomID
 #Socket
-SocketHandler
+ClientSocket
     fun:
         onMessage(type,data)
         sendMessage(type,data)
@@ -137,7 +137,7 @@ SocketHandler
         onAddPlayer
         onRemovePlayer
 
-JoinSocketHandler : SocketHandler
+JoinSocket : ClientSocket
     fun:
         joinRoom(player)
         #send
@@ -152,11 +152,14 @@ JoinSocketHandler : SocketHandler
         gameStart
         gameEnd
 
+        startWait
+        endWait
+
         goAdd
         goRemove
         goUpdate
 
-HostSocketHandler : SocketHandler
+HostSocket : ClientSocket
     fun:
         createRoom(player)
         #callback
@@ -170,3 +173,23 @@ HostSocketHandler : SocketHandler
         removePlayer
 
         onGameAction
+
+#---------Flow---------
+option
+    host
+    join
+        {name,roomID}
+        verify #check roomID exist or not
+            exist
+                yes
+                    navigate(/join-room,state{name,roomID})
+                        #join-room
+                            player={name,roomID,id:generateID()}
+                            socket.joinRoom(player) #send room/join
+                                #server
+                                    
+
+
+                no
+                    alert("roomID not exist") 
+

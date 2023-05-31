@@ -1,6 +1,7 @@
+/*
 import { useEffect, useState } from "react";
 import SocketHandler, { EventCallback } from "../SocketHandler";
-import { Player, Utils } from "../Utils";
+import { Player, Utils } from "../ts/Utils";
 import { useNavigate } from "react-router";
 
 export interface LobbyProps {
@@ -41,3 +42,4 @@ export default function Lobby(props: LobbyProps) {
         </div>
     );
 }
+*/

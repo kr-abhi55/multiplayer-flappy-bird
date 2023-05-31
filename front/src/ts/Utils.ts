@@ -16,7 +16,7 @@ export namespace Utils {
             const result = await fetch(`${SERVER_URL}${url}${query.length == 0 ? '' : ('?' + query)}`, requestOptions)
             return await result.json()
         } catch (error) {
-            alert(error)
+            console.error(error)
             return { error }
         }
     }
@@ -25,12 +25,7 @@ export namespace Utils {
     }
 }
 
-export interface Player {
-    isHost: boolean,
-    name: string,
-    playerID: string
-    roomID: string
-}
+
 export interface GameObject {
     id: string,
     x: number,

@@ -5,17 +5,19 @@ export interface Player {
     id: string
     roomID: string
 }
-export type HostToPlayerMessage =
-    "game/start" | "game/end" | "game/wait" |
-    "go/update" | "go/add" | "go/remove"
-
-export type PlayerToHostMessage = "game/action"
-
-export type RoomToPlayerMessage = "player/add" | "player/remove" | HostToPlayerMessage | "room/closed"
+export type MessageType =
+    "room/create" | "room/created" | "room/closed" | "room/join" | "room/joined" |
+    "player/add" | "player/remove"
 
 export interface SocketInfo {
-    playerID: string
     ws: WebSocket.WebSocket
-    isHost: boolean
+}
+export interface FlappySocketInfo extends SocketInfo {
     room: Room | null
+    playerID: string
+    isHost: boolean
+}
+export function removeWs(info: SocketInfo) {
+    const { ws, ...withoutWs } = info
+    return withoutWs
 }

@@ -1,4 +1,5 @@
-import { Player } from "./Utils";
+/*
+import { Player } from "./ts/Utils";
 
 type MessageType = "create/room" | "join/room" | "dis-join/room" | "room/closed" | "get/rooms" |
     "remove-player" | "add-player" |
@@ -142,3 +143,5 @@ export default class SocketHandler {
     }
 
 }
+
+*/

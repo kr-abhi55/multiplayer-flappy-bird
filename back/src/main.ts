@@ -1,4 +1,10 @@
 import dotenv from 'dotenv';
+import { FlappyApp } from './flappy/FlappyApp.js';
+dotenv.config()
+
+FlappyApp.run()
+
+/*
 import express from 'express';
 import cors from 'cors'
 import Utils from './Utils.js';
@@ -15,7 +21,7 @@ const server = app.listen(Utils.env.EXPRESS_PORT, () => {
 
 const socketHandler = new SocketHandler(server)
 
-/*---------------route----------------*/
+
 
 app.get("/room", (req, res) => {
     res.json({ rooms: getRooms() })
@@ -42,7 +48,6 @@ app.get("/room/can-join/:id", (req, res) => {
     res.status(400).json({ error: "room not exist" })
 })
 
-/*--------------*/
 function getRooms() {
     const rooms = socketHandler.rooms
     return Array.from(rooms).map(([roomID, room]) => {
@@ -58,3 +63,5 @@ function getRooms() {
         };
     });
 }
+
+*/

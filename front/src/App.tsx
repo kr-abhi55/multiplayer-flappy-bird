@@ -5,7 +5,8 @@ import Options from "./pages/Options"
 import NoPage from "./pages/NoPage"
 import Host from "./pages/Host"
 import Join from "./pages/Join"
-import Room from "./pages/Room"
+import HostRoom from "./pages/HostRoom"
+import JoinRoom from "./pages/JoinRoom"
 
 function App() {
 
@@ -16,7 +17,8 @@ function App() {
           <Route index element={<Options />} />
           <Route path="/host" element={<Host />} />
           <Route path="/join" element={<Join />} />
-          <Route path="/room" element={<Room />} />
+          <Route path="/host-room" element={<HostRoom />} />
+          <Route path="/join-room" element={<JoinRoom />} />
           <Route path="*" element={<NoPage />} />
         </Route>
       </Routes>
