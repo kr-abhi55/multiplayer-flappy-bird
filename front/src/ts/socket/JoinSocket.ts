@@ -1,6 +1,5 @@
-import { ActionType } from "../../SocketHandler";
 import { GameObject } from "../Utils";
-import { Player } from "../common";
+import { ActionType, Player } from "../common";
 import { ClientSocket } from "./ClientSocket";
 import { JoinSocketImp } from "./JoinSocketImp";
 
@@ -10,8 +9,8 @@ export abstract class JoinSocket extends ClientSocket {
     abstract joinRoom(player: Player): void
     abstract sendAction(action: ActionType, data: any): void
 
-    onJoinedRoom(player: Player[]) { }
-    onDisJoinedRoom() { }
+    onJoinRoom(player: Player[]) { }
+    onCloseRoom() { }
 
     onGameStart(gos: GameObject[]) { }
     onGameEnd() { }

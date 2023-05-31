@@ -12,6 +12,8 @@ export default function JoinRoom() {
     const [isLobby, setIsLobby] = useState(true)
     const [player, setPlayer] = useState<Player>()
     const [socket, setSocket] = useState<JoinSocket>()
+    const [players, setPlayers] = useState<Player[]>([])
+
     useEffect(() => {
         if (!state) {
             navigate("/")
@@ -30,7 +32,6 @@ export default function JoinRoom() {
         if (player) {
             _socket = new (class extends JoinSocketImp {
                 async onConnected(): Promise<void> {
-                    //this.joinRoom(_player)
                     //if room exist
                     const { error, result } = await Utils.getJson("room/exist/" + player.roomID)
                     if (result) {
@@ -38,8 +39,17 @@ export default function JoinRoom() {
                     }
                     return navigate("/join")
                 }
-                onJoinedRoom(player: Player[]): void {
-                    console.log(player)
+                onJoinRoom(players: Player[]): void {
+                    setPlayers(players)
+                }
+                onAddPlayer(player: Player): void {
+                    setPlayers((old) => [...old, player])
+                }
+                onRemovePlayer(playerID: string): void {
+                    setPlayers((old) => {
+                        const f = old.filter((p) => p.id !== playerID)
+                        return f
+                    });
                 }
             })(Utils.env.SOCKET_URL)
             setSocket(_socket)
@@ -52,7 +62,7 @@ export default function JoinRoom() {
     }, [player])
     return (
         <div>
-
+            {players.length}
         </div>
     )
 }

@@ -1,5 +1,5 @@
 import { GameObject } from "../Utils";
-import { Player, MessageType,ActionType } from "../common";
+import { Player, MessageType, ActionType } from "../common";
 import { ClientSocketImp } from "./ClientSocketImp";
 import { JoinSocket } from "./JoinSocket";
 
@@ -15,19 +15,21 @@ export class JoinSocketImp extends ClientSocketImp implements JoinSocket {
 
     }
     onMessage(type: MessageType, data: any): void {
+        super.onMessage(type, data)
         switch (type) {
             case "room/joined":
-                this.onJoinedRoom(data)
+                this.onJoinRoom(data)
+                break;
+            case "room/closed":
+                this.onCloseRoom()
                 break;
 
             default:
                 break;
         }
     }
-    onJoinedRoom(player: Player[]): void {
-
-    }
-    onDisJoinedRoom(): void { }
+    onJoinRoom(player: Player[]): void { }
+    onCloseRoom(): void { }
     onGameStart(gos: GameObject[]): void { }
     onGameEnd(): void { }
     onStartWait(): void { }

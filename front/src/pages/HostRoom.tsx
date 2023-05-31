@@ -12,6 +12,7 @@ export default function HostRoom() {
     const [isLobby, setIsLobby] = useState(true)
     const [player, setPlayer] = useState<Player>()
     const [socket, setSocket] = useState<HostSocket>()
+    const [players, setPlayers] = useState<Player[]>([])
     useEffect(() => {
         let _socket: HostSocket
         if (!state) {
@@ -32,7 +33,16 @@ export default function HostRoom() {
                 onDisConnected(): void {
                 }
                 onRoomCreated(): void {
-                    console.log("room created")
+
+                }
+                onAddPlayer(player: Player): void {
+                    setPlayers((old) => [...old, player])
+                }
+                onRemovePlayer(playerID: string): void {
+                    setPlayers((old) => {
+                        const f = old.filter((p) => p.id !== playerID)
+                        return f
+                    });
                 }
 
             })(Utils.env.SOCKET_URL)
@@ -46,7 +56,7 @@ export default function HostRoom() {
     }, [])
     return (
         <div>
-
+            {players.length}
         </div>
     )
 }

@@ -37,5 +37,18 @@ export class ClientSocketImp extends ClientSocket {
     sendMessage(type: MessageType, data: any): void {
         this.wSocket.send(JSON.stringify({ type, data }))
     }
+    onMessage(type: MessageType, data: any): void {
+        switch (type) {
+            case "player/add":
+                this.onAddPlayer(data)
+                break;
+            case "player/remove":
+                this.onRemovePlayer(data)
+                break;
+
+            default:
+                break;
+        }
+    }
 
 }

@@ -1,8 +1,6 @@
-import { ActionType, Player } from "../common";
-import { ClientSocket } from "./ClientSocket";
+import { ActionType, MessageType, Player } from "../common";
 import { ClientSocketImp } from "./ClientSocketImp";
 import { HostSocket } from "./HostSocket";
-import { JoinSocket } from "./JoinSocket";
 
 
 export class HostSocketImp extends ClientSocketImp implements HostSocket {
@@ -11,6 +9,20 @@ export class HostSocketImp extends ClientSocketImp implements HostSocket {
     }
     createRoom(player: Player): void {
         this.sendMessage("room/create", player)
+    }
+    onMessage(type: MessageType, data: any): void {
+        super.onMessage(type, data)
+        switch (type) {
+            case "room/created":
+                this.onRoomCreated()
+                break;
+            case "room/closed":
+                this.onRoomClosed()
+                break;
+
+            default:
+                break;
+        }
     }
     onRoomCreated(): void {
     }
