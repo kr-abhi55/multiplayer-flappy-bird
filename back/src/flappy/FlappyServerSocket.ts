@@ -55,15 +55,36 @@ export class FlappyServerSocket extends ServerSocketImp {
             }
         }
     }
-    onHostMessage(socketInfo: FlappySocketInfo, message: any) {
+    onHostMessage(si: FlappySocketInfo, message: any) {
         /*
         *-message is send by host to send to all players
         *-game/start,end,wait go/update,add,remove
+        *-game/start is send to only one player at a time
         */
+        const { type, data }: {
+            type: MessageType, data: any
+        } = message
+        switch (type) {
+            case "game/start":
+                const { playerID, gos } = data
+                si.room?.sendMessageToPlayer(playerID, type, gos)
+                break;
+            default:
+                si.room?.sendMessageToAllPlayers(type, data)
+                break;
+        }
+
+
     }
 
-    onPlayerMessage(socketInfo: FlappySocketInfo, message: any) {
-
+    onPlayerMessage(si: FlappySocketInfo, message: any) {
+        /**
+         * send by player to host like game/action
+         */
+        const { type, data }: {
+            type: MessageType, data: any
+        } = message
+        si.room?.sendMessageToHost(type, data)
     }
     onConnected(): void {
         console.log("socket server connected")

@@ -58,6 +58,9 @@ export class RoomImp extends Room {
             ws.send(JSON.stringify({ type, data }));
         }
     }
+    sendMessageToPlayer(playerID: string, type: MessageType, data: any): void {
+        this.playerIDWsMap.get(playerID)?.send(JSON.stringify({ type, data }));
+    }
 
     close(): void {
         //when host disconnect

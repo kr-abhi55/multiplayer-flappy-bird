@@ -192,4 +192,30 @@ option
 
                 no
                     alert("roomID not exist") 
+#host
+    #game start
+        create gameObjects for all players
+        create playerGoID map
+        send onStart(gos)
+    #create go
+        add go to gos
+        send go/add to all player
+    #delete go
+        remove from gos
+        send go/remove to all player
+    #onSendTick
+        send gameObject position to all player
+#player sendAction(type,data)
 
+#----------Go-------------
+GameObject:
+    type
+    id
+    x,y
+WallGo: GameObject
+    type="wall"
+    width,height
+    color
+PlayerGo:
+    type="player"
+    color

@@ -9,6 +9,7 @@ export abstract class Room {
     abstract sendMessageToAllPlayers(type: MessageType, data: any): void;
 
     abstract sendMessageToHost(type: MessageType, data: any): void;
+    abstract sendMessageToPlayer(playerID:string,type: MessageType, data: any): void;
     abstract sendToAll(type: MessageType, data: any, exceptID: string, toHost: boolean): void;
 
 
