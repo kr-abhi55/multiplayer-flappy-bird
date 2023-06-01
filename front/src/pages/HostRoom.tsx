@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react"
 import { useLocation, useNavigate } from "react-router"
-import { Player } from "../ts/common"
+import { GameObject, Player } from "../ts/common"
 import { HostSocket } from "../ts/socket/HostSocket"
 import { Utils } from "../ts/Utils"
 import { HostSocketImp } from "../ts/socket/HostSocketImp "
 import HostLobby from "../components/HostLobby"
+import HostGame from "../components/HostGame"
 
 
 export default function HostRoom() {
@@ -14,6 +15,7 @@ export default function HostRoom() {
     const [player, setPlayer] = useState<Player>()
     const [socket, setSocket] = useState<HostSocket>()
     const [players, setPlayers] = useState<Player[]>([])
+    const [gameObjects, setGameObjects] = useState<GameObject[]>([])
     /*------------------------------*/
     const initSocket = (player: Player) => {
         return new (class extends HostSocketImp {
@@ -71,6 +73,9 @@ export default function HostRoom() {
     function handleStart() {
 
     }
+    function handleEnd() {
+
+    }
     return (
         <div className="full">
 
@@ -78,7 +83,7 @@ export default function HostRoom() {
                 ((isLobby) ?
                     <HostLobby players={players} onStart={handleStart} player={player} />
                     :
-                    <div />
+                    <HostGame gameObjects={gameObjects} onGameEnd={handleEnd} player={player} socket={socket} />
                 )}
         </div>
     )

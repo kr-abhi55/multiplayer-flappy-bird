@@ -1,15 +1,13 @@
-/*
 import { useEffect, useRef } from "react";
-import SocketHandler, { ActionType } from "../SocketHandler";
-import { GameObject, Player } from "../ts/Utils";
+import { GameObject, Player, ActionType } from "../ts/common";
+import { JoinSocket } from "../ts/socket/JoinSocket";
 
 export interface GameProps {
-    onGameEnd: () => void
     gameObjects: GameObject[]
     player: Player
-    socket: SocketHandler
+    socket: JoinSocket
 }
-export default function Game(props: GameProps) {
+export default function JoinGame(props: GameProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null)
     function onDraw(ctx: CanvasRenderingContext2D) {
         //draw all game objects
@@ -43,7 +41,7 @@ export default function Game(props: GameProps) {
             const x = e.offsetX
             const y = e.offsetY
             // console.log(x, y)
-            sendAction("set_pos", { x, y })
+           // sendAction("set_pos", { x, y })
             //send message update pos
         }
         canvas.addEventListener('mousemove', onMove)
@@ -56,7 +54,6 @@ export default function Game(props: GameProps) {
         <div className="full" style={{ overflow: 'hidden' }}>
             <canvas ref={canvasRef} ></canvas>
             <div className="game-panel">
-                {props.player.isHost && <button onClick={props.onGameEnd}>end</button>}
                 <div>
                     {props.player.name}
                 </div>
@@ -64,4 +61,3 @@ export default function Game(props: GameProps) {
         </div>
     );
 }
-*/

@@ -7,7 +7,9 @@ export interface Player {
 }
 export type MessageType =
     "room/create" | "room/created" | "room/closed" | "room/join" | "room/joined" |
-    "player/add" | "player/remove"
+    "player/add" | "player/remove" | "game/start" | "game/end" |
+    "go/add" | "go/update" | "go/remove" |
+    "game/action"
 
 export interface SocketInfo {
     ws: WebSocket.WebSocket

@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react"
 import { useLocation, useNavigate } from "react-router"
-import { Player } from "../ts/common"
+import { GameObject, Player } from "../ts/common"
 import { Utils } from "../ts/Utils"
 import { JoinSocketImp } from "../ts/socket/JoinSocketImp"
 import { JoinSocket } from "../ts/socket/JoinSocket"
 import JoinLobby from "../components/JoinLobby"
+import JoinGame from "../components/JoinGame"
 
 
 export default function JoinRoom() {
@@ -14,6 +15,8 @@ export default function JoinRoom() {
     const [player, setPlayer] = useState<Player>()
     const [socket, setSocket] = useState<JoinSocket>()
     const [players, setPlayers] = useState<Player[]>([])
+    const [gameObjects, setGameObjects] = useState<GameObject[]>([])
+
     /*------------------------------*/
     const initSocket = (player: Player) => {
         return new (class extends JoinSocketImp {
@@ -26,7 +29,7 @@ export default function JoinRoom() {
                 return navigate("/join")
             }
             onCloseRoom(): void {
-                navigate("/join",{replace:true})
+                navigate("/join", { replace: true })
             }
             onJoinRoom(players: Player[]): void {
                 setPlayers(players)
@@ -74,12 +77,12 @@ export default function JoinRoom() {
     return (
         <div className="full">
 
-        {(state && player && socket) &&
-            ((isLobby) ?
-                <JoinLobby players={players} player={player} />
-                :
-                <div />
-            )}
-    </div>
+            {(state && player && socket) &&
+                ((isLobby) ?
+                    <JoinLobby players={players} player={player} />
+                    :
+                    <JoinGame gameObjects={gameObjects} player={player} socket={socket} />
+                )}
+        </div>
     )
 }
