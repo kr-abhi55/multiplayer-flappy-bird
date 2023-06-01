@@ -11,7 +11,6 @@ export class ClientSocketImp extends ClientSocket {
         });
         this.wSocket.addEventListener('message', (e) => {
             const { type, data } = JSON.parse(e.data);
-            console.log(type, data)
             this.onMessage(type, data)
         })
         this.wSocket.addEventListener('close', () => {

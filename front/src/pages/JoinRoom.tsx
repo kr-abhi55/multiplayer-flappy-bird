@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useLocation, useNavigate } from "react-router"
 import { GameObject, Player } from "../ts/common"
 import { Utils } from "../ts/Utils"
@@ -15,7 +15,7 @@ export default function JoinRoom() {
     const [player, setPlayer] = useState<Player>()
     const [socket, setSocket] = useState<JoinSocket>()
     const [players, setPlayers] = useState<Player[]>([])
-    const [gameObjects, setGameObjects] = useState<GameObject[]>([])
+    const gosRef = useRef<GameObject[]>([])
 
     /*------------------------------*/
     const initSocket = (player: Player) => {
@@ -27,6 +27,18 @@ export default function JoinRoom() {
                     return this.joinRoom(player)
                 }
                 return navigate("/join")
+            }
+            onGoUpdate(gos: GameObject[]): void {
+                gosRef.current=gos
+            }
+            onGameStart(gos: GameObject[]): void {
+
+                gosRef.current=gos
+
+                setIsLobby(false)
+            }
+            onGameEnd(): void {
+                setIsLobby(true)
             }
             onCloseRoom(): void {
                 navigate("/join", { replace: true })
@@ -81,7 +93,7 @@ export default function JoinRoom() {
                 ((isLobby) ?
                     <JoinLobby players={players} player={player} />
                     :
-                    <JoinGame gameObjects={gameObjects} player={player} socket={socket} />
+                    <JoinGame gosRef={gosRef} player={player} socket={socket} />
                 )}
         </div>
     )

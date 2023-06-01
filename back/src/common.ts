@@ -23,3 +23,10 @@ export function removeWs(info: SocketInfo) {
     const { ws, ...withoutWs } = info
     return withoutWs
 }
+
+export interface GameObject {
+    id: string,
+    x: number,
+    y: number,
+    color: string,
+}

@@ -12,8 +12,10 @@ export type MessageType =
     "go/add" | "go/update" | "go/remove" |
     "game/action"
 export interface GameObject {
-    id: string,
-    x: number,
-    y: number,
-    color: string,
+    id: string
+    x: number
+    y: number
+    color: string
+    key: string
+    keyState: "up" | "down"
 }

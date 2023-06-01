@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useLocation, useNavigate } from "react-router"
 import { GameObject, Player } from "../ts/common"
 import { HostSocket } from "../ts/socket/HostSocket"
@@ -15,7 +15,8 @@ export default function HostRoom() {
     const [player, setPlayer] = useState<Player>()
     const [socket, setSocket] = useState<HostSocket>()
     const [players, setPlayers] = useState<Player[]>([])
-    const [gameObjects, setGameObjects] = useState<GameObject[]>([])
+    const gosRef = useRef<GameObject[]>([])
+    const playerGoMap = useRef(new Map<string, GameObject>())
     /*------------------------------*/
     const initSocket = (player: Player) => {
         return new (class extends HostSocketImp {
@@ -46,6 +47,48 @@ export default function HostRoom() {
             roomID: roomID
         } as Player
     }
+    function hostInitGame() {
+        const gos = Array<GameObject>()
+        const map = new Map<string, GameObject>()
+        const go: GameObject = {
+            id: Utils.generateID(),
+            color: 'red',
+            x: Math.random() * 400,
+            y: Math.random() * 300,
+            key: "",
+            keyState: "up"
+        }
+        gos.push(go)
+        if (player) {
+            map.set(player.id, go)
+        }
+        //add player gameObject and set in map
+        players.forEach((player) => {
+            const go: GameObject = {
+                id: Utils.generateID(),
+                color: 'red',
+                x: Math.random() * 400,
+                y: Math.random() * 300,
+                key: "",
+                keyState: "up"
+            }
+            gos.push(go)
+            map.set(player.id, go)
+        })
+        //send gameObject to all players by before/game/start
+        socket?.sendMessage("game/start", gos)
+        gosRef.current = gos
+        playerGoMap.current = map
+    }
+    function handleStart() {
+        hostInitGame()
+        setIsLobby(false)
+    }
+    function handleEnd() {
+        socket?.sendMessage("game/end", {})
+        setIsLobby(true)
+    }
+
     /*-------useEffect----------------*/
     //update player
     useEffect(() => {
@@ -70,12 +113,7 @@ export default function HostRoom() {
             }
         }
     }, [player])
-    function handleStart() {
 
-    }
-    function handleEnd() {
-
-    }
     return (
         <div className="full">
 
@@ -83,7 +121,7 @@ export default function HostRoom() {
                 ((isLobby) ?
                     <HostLobby players={players} onStart={handleStart} player={player} />
                     :
-                    <HostGame gameObjects={gameObjects} onGameEnd={handleEnd} player={player} socket={socket} />
+                    <HostGame  go={playerGoMap.current.get(player.id)!} gosRef={gosRef} onGameEnd={handleEnd} player={player} socket={socket} />
                 )}
         </div>
     )

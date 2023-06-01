@@ -1,5 +1,4 @@
-import { GameObject } from "../Utils";
-import { Player, MessageType, ActionType } from "../common";
+import { Player, MessageType, ActionType, GameObject } from "../common";
 import { ClientSocketImp } from "./ClientSocketImp";
 import { JoinSocket } from "./JoinSocket";
 
@@ -23,7 +22,22 @@ export class JoinSocketImp extends ClientSocketImp implements JoinSocket {
             case "room/closed":
                 this.onCloseRoom()
                 break;
+            case "game/start":
+                this.onGameStart(data)
+                break;
+            case "game/end":
+                this.onGameEnd()
+                break;
 
+            case "go/add":
+                this.onGoAdd(data)
+                break;
+            case "go/update":
+                this.onGoUpdate(data)
+                break;
+            case "go/remove":
+                this.onGoRemove(data)
+                break;
             default:
                 break;
         }

@@ -1,9 +1,9 @@
-import { useEffect, useRef } from "react";
+import { MutableRefObject, useEffect, useRef } from "react";
 import { GameObject, Player, ActionType } from "../ts/common";
 import { JoinSocket } from "../ts/socket/JoinSocket";
 
 export interface GameProps {
-    gameObjects: GameObject[]
+    gosRef: MutableRefObject<GameObject[]>
     player: Player
     socket: JoinSocket
 }
@@ -11,7 +11,7 @@ export default function JoinGame(props: GameProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null)
     function onDraw(ctx: CanvasRenderingContext2D) {
         //draw all game objects
-        props.gameObjects.forEach((go) => {
+        props.gosRef.current.forEach((go) => {
             ctx.fillStyle = go.color
             ctx.fillRect(go.x, go.y, 50, 50)
         })
@@ -41,7 +41,7 @@ export default function JoinGame(props: GameProps) {
             const x = e.offsetX
             const y = e.offsetY
             // console.log(x, y)
-           // sendAction("set_pos", { x, y })
+            // sendAction("set_pos", { x, y })
             //send message update pos
         }
         canvas.addEventListener('mousemove', onMove)

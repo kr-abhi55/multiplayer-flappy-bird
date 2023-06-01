@@ -64,15 +64,16 @@ export class FlappyServerSocket extends ServerSocketImp {
         const { type, data }: {
             type: MessageType, data: any
         } = message
-        switch (type) {
-            case "game/start":
-                const { playerID, gos } = data
-                si.room?.sendMessageToPlayer(playerID, type, gos)
-                break;
-            default:
-                si.room?.sendMessageToAllPlayers(type, data)
-                break;
-        }
+        si.room?.sendMessageToAllPlayers(type, data)
+        // switch (type) {
+        //     case "game/start":
+        //         const { playerID, gos } = data
+        //         si.room?.sendMessageToPlayer(playerID, type, gos)
+        //         break;
+        //     default:
+
+        //         break;
+        // }
 
 
     }
