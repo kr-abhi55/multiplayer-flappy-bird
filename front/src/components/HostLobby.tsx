@@ -1,31 +1,27 @@
-/*
-import { useEffect, useState } from "react";
-import SocketHandler, { EventCallback } from "../SocketHandler";
-import { Player, Utils } from "../ts/Utils";
-import { useNavigate } from "react-router";
 
-export interface LobbyProps {
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
+import { Player } from "../ts/common";
+
+export interface HostLobbyProps {
     players: Player[]
     player: Player
-    socket: SocketHandler,
     onStart?: () => void
 }
 function Item({ player, isSelf }: { player: Player, isSelf: boolean }) {
     return (
-        <div className="item">{player.name}{player.isHost && "@host"}{isSelf && "@me"}</div>
+        <div className="item">{player.name}{isSelf && "@me"}</div>
     )
 }
-export default function Lobby(props: LobbyProps) {
+export default function HostLobby(props: HostLobbyProps) {
     return (
         <div className="full lobby" >
             <div className="lobby-header">
-                {props.player.isHost && (
-                    <div>
-                        <button onClick={props.onStart}>Start</button>
-                    </div>
-                )}
+                <div>
+                    <button onClick={props.onStart}>Start</button>
+                </div>
                 <div className="lobby-title">
-                    {props.player.isHost ? "Host" : "Player"}
+                    Host
                 </div>
                 <div>Name:{props.player.name}</div>
                 <div>RoomID:{props.player.roomID}</div>
@@ -42,4 +38,3 @@ export default function Lobby(props: LobbyProps) {
         </div>
     );
 }
-*/
