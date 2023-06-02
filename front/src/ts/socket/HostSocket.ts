@@ -1,5 +1,4 @@
-import { ActionType } from "../../SocketHandler";
-import { Player } from "../common";
+import { ActionType, Player } from "../common";
 import { ClientSocket } from "./ClientSocket";
 
 
