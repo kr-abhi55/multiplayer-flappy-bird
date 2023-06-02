@@ -85,6 +85,7 @@ export class FlappyServerSocket extends ServerSocketImp {
         const { type, data }: {
             type: MessageType, data: any
         } = message
+        console.log(type)
         si.room?.sendMessageToHost(type, data)
     }
     onConnected(): void {

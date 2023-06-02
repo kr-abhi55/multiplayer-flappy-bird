@@ -10,23 +10,24 @@ export interface GameProps {
     socket: HostSocket
     go: GameObject
 }
-const speed = 10
+const speed = 500
 export default function HostGame(props: GameProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null)
-    function onDraw(ctx: CanvasRenderingContext2D) {
+    function onDraw(ctx: CanvasRenderingContext2D,dt:number) {
         //draw all game objects
         const gos = props.gosRef.current
+
         gos.forEach((go) => {
             if (go.keyState == "down") {
                 if (go.key == "ArrowLeft") {
-                    go.x -= speed
+                    go.x -= speed*dt
                 } else if (go.key == "ArrowRight") {
-                    go.x += speed
+                    go.x += speed*dt
                 }
                 else if (go.key == "ArrowUp") {
-                    go.y -= speed
+                    go.y -= speed*dt
                 } else if (go.key == "ArrowDown") {
-                    go.y += speed
+                    go.y += speed*dt
                 }
             }
             ctx.fillStyle = go.color
@@ -50,11 +51,14 @@ export default function HostGame(props: GameProps) {
             canvas.width = window.innerWidth
             canvas.height = window.innerHeight
         }
-        const render = () => {
+        let previousTime = 0;
+        const render = (time:number) => {
+            const dt=(time-previousTime)/1000
             context.clearRect(0, 0, canvas.width, canvas.height)
-            onDraw(context)
-            // updateTick()
-            // animationFrameId = requestAnimationFrame(render)
+            onDraw(context,dt)
+            updateTick()
+            animationFrameId = requestAnimationFrame(render)
+            previousTime=time
         }
         animationFrameId = requestAnimationFrame(render)
         const onMove = (e: MouseEvent) => {
@@ -75,8 +79,7 @@ export default function HostGame(props: GameProps) {
         canvas.addEventListener("keyup", keyUp)
         canvas.addEventListener('mousemove', onMove)
         const timer = setInterval(() => {
-            render()
-            updateTick()
+
             // console.log(props.gosRef, "gos")
         }, 20)
         return () => {

@@ -1,5 +1,4 @@
-import { GameObject } from "../Utils";
-import { ActionType, Player } from "../common";
+import { ActionType, GameObject, Player } from "../common";
 import { ClientSocket } from "./ClientSocket";
 import { JoinSocketImp } from "./JoinSocketImp";
 

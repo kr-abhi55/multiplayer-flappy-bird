@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import { useLocation, useNavigate } from "react-router"
-import { GameObject, Player } from "../ts/common"
+import { ActionType, GameObject, Player } from "../ts/common"
 import { HostSocket } from "../ts/socket/HostSocket"
 import { Utils } from "../ts/Utils"
 import { HostSocketImp } from "../ts/socket/HostSocketImp "
@@ -37,6 +37,16 @@ export default function HostRoom() {
                     return f
                 });
             }
+            onGameAction(type: ActionType, data: any): void {
+                const go = goByPlayerID(data.playerID)
+                if (go) {
+
+                    go.key = data.key
+                    go.keyState = data.keyState
+                    playerGoMap.current.set(data.playerID, go)
+                }
+            }
+
 
         })(Utils.env.SOCKET_URL)
     }
@@ -47,31 +57,27 @@ export default function HostRoom() {
             roomID: roomID
         } as Player
     }
-    function hostInitGame() {
-        const gos = Array<GameObject>()
-        const map = new Map<string, GameObject>()
-        const go: GameObject = {
+    function makeGo() {
+        return {
             id: Utils.generateID(),
-            color: 'red',
+            color: Utils.getRandomColor(),
             x: Math.random() * 400,
-            y: Math.random() * 300,
+            y: Math.random() * 200,
             key: "",
             keyState: "up"
-        }
+        } as GameObject
+    }
+    function initGame() {
+        const gos = Array<GameObject>()
+        const map = new Map<string, GameObject>()
+        const go=makeGo()
         gos.push(go)
         if (player) {
             map.set(player.id, go)
         }
         //add player gameObject and set in map
         players.forEach((player) => {
-            const go: GameObject = {
-                id: Utils.generateID(),
-                color: 'red',
-                x: Math.random() * 400,
-                y: Math.random() * 300,
-                key: "",
-                keyState: "up"
-            }
+            const go=makeGo()
             gos.push(go)
             map.set(player.id, go)
         })
@@ -81,12 +87,15 @@ export default function HostRoom() {
         playerGoMap.current = map
     }
     function handleStart() {
-        hostInitGame()
+        initGame()
         setIsLobby(false)
     }
     function handleEnd() {
         socket?.sendMessage("game/end", {})
         setIsLobby(true)
+    }
+    function goByPlayerID(playerID: string) {
+        return playerGoMap.current.get(playerID)
     }
 
     /*-------useEffect----------------*/
@@ -121,7 +130,7 @@ export default function HostRoom() {
                 ((isLobby) ?
                     <HostLobby players={players} onStart={handleStart} player={player} />
                     :
-                    <HostGame  go={playerGoMap.current.get(player.id)!} gosRef={gosRef} onGameEnd={handleEnd} player={player} socket={socket} />
+                    <HostGame go={playerGoMap.current.get(player.id)!} gosRef={gosRef} onGameEnd={handleEnd} player={player} socket={socket} />
                 )}
         </div>
     )

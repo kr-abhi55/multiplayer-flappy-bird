@@ -11,7 +11,7 @@ export class JoinSocketImp extends ClientSocketImp implements JoinSocket {
         this.sendMessage('room/join', player)
     }
     sendAction(action: ActionType, data: any): void {
-
+        this.sendMessage("game/action",{type:action,data})
     }
     onMessage(type: MessageType, data: any): void {
         super.onMessage(type, data)

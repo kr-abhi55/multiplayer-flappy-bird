@@ -19,6 +19,8 @@ export default function JoinGame(props: GameProps) {
     function sendAction(type: ActionType, data: any) {
         props.socket.sendAction(type, data)
     }
+
+
     useEffect(() => {
         const canvas = canvasRef.current!;
         const context = canvas.getContext('2d')!
@@ -45,14 +47,32 @@ export default function JoinGame(props: GameProps) {
             //send message update pos
         }
         canvas.addEventListener('mousemove', onMove)
+        const keyDown = (e: KeyboardEvent) => {
+            sendAction("key", {
+                playerID: props.player.id,
+                key: e.key,
+                keyState: "down"
+            })
+        }
+        canvas.addEventListener("keydown", keyDown)
+        const keyUp = (e: KeyboardEvent) => {
+            sendAction("key", {
+                playerID: props.player.id,
+                key: e.key,
+                keyState: "up"
+            })
+        }
+        canvas.addEventListener("keyup", keyUp)
         return () => {
             canvas.removeEventListener('mousemove', onMove)
             cancelAnimationFrame(animationFrameId);
+            canvas.removeEventListener("keydown", keyDown)
+            canvas.removeEventListener("keyup", keyUp)
         };
     }, [])
     return (
         <div className="full" style={{ overflow: 'hidden' }}>
-            <canvas ref={canvasRef} ></canvas>
+            <canvas tabIndex={1} ref={canvasRef} ></canvas>
             <div className="game-panel">
                 <div>
                     {props.player.name}

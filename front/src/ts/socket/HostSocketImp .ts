@@ -19,6 +19,9 @@ export class HostSocketImp extends ClientSocketImp implements HostSocket {
             case "room/closed":
                 this.onRoomClosed()
                 break;
+            case "game/action":
+                this.onGameAction(data.type, data.data)
+                break;
 
             default:
                 break;

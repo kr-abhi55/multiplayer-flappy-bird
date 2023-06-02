@@ -3,7 +3,7 @@ export interface Player {
     id: string
     roomID: string
 }
-export type ActionType = "d"
+export type ActionType = "key"|""
 
 
 export type MessageType =

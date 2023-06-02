@@ -206,7 +206,8 @@ option
     #onSendTick
         send gameObject position to all player
 #player sendAction(type,data)
-
+    type: key
+        data:{playerID,key,keyState}
 #----------Go-------------
 GameObject:
     type
