@@ -32,7 +32,7 @@ export default function HostGame(props: GameProps) {
     function updateTick() {
         props.socket.sendMessage("go/update", props.gosRef.current)
     }
-   
+
     useEffect(() => {
         const canvas = canvasRef.current!;
         const context = canvas.getContext('2d')!
@@ -40,7 +40,7 @@ export default function HostGame(props: GameProps) {
 
         // canvas.width = window.innerWidth
         // canvas.height = window.innerHeight
-        const game = new Game(props.gosRef)
+        const game = new Game(props.gosRef, props.go)
         game.setSize(canvas.width, canvas.height)
         setGame(game)
 
@@ -53,7 +53,7 @@ export default function HostGame(props: GameProps) {
         const render = (time: number) => {
             const dt = (time - previousTime) / 1000
             context.clearRect(0, 0, canvas.width, canvas.height)
-            game.update(context,dt)
+            game.update(context, dt)
             // onInput()
             // onPhysics(dt)
             // onDraw(context, dt)

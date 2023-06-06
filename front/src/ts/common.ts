@@ -17,8 +17,8 @@ export interface Point {
 }
 export class GameObject {
     id: string = ""
-    width=50
-    height=50
+    width = 50
+    height = 50
     position: Point = { x: 0, y: 0 }
     velocity: Point = { x: 0, y: 0 }
     color: string = "black"
@@ -26,8 +26,7 @@ export class GameObject {
     keyState: "up" | "down" = "up"
     bodyType: "dynamic" | "static" = "dynamic"
     tag: "wall" | "player" = "player"
-    physicsOff=false
-    collisionOff=false
-    info:any={}
+    info: any = {}
+    state: "review" | "normal" | "wait" = "normal"
 
 }

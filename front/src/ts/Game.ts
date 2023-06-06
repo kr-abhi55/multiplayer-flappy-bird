@@ -1,10 +1,9 @@
 import { MutableRefObject } from "react";
-import { GameObject } from "./common";
+import { GameObject, Point } from "./common";
 
 export class Game {
     width = 500
     height = 300
-
     public get bottom(): number {
         return this.height - 25
     }
@@ -50,7 +49,7 @@ export class Game {
         const players = gos.filter((go) => go.tag == 'player')
         for (let i = 0; i < players.length; i++) {
             const player = players[i];
-            if (player.collisionOff) continue
+            if (player.state != 'normal') continue
             for (let j = 0; j < gos.length; j++) {
                 const gameObject = gos[j];
 
@@ -73,7 +72,7 @@ export class Game {
     private physics(dt: number, gos: GameObject[]) {
         const g = 9.8 //px/s
         gos.forEach((go) => {
-            if (!go.physicsOff  && go.bodyType == 'dynamic' && go.tag == 'player') {
+            if (  go.bodyType == 'dynamic' && go.tag == 'player' && go.state != 'wait') {
                 go.velocity.y += g
                 go.position.y += go.velocity.y * dt
                 go.position.x += go.velocity.x * dt
@@ -82,19 +81,26 @@ export class Game {
 
     }
     private draw(ctx: CanvasRenderingContext2D, gos: GameObject[]) {
-
+        const diff = this.player.position.x - this.width * 0.5
+        const offset: Point = {
+            x: diff > 0 ? diff : 0,
+            y: 0
+        }
+        ctx.save()
+        ctx.translate(-offset.x, offset.y)
         gos.forEach((go) => {
 
             ctx.fillStyle = go.color
             ctx.fillRect(go.position.x, go.position.y, go.width, go.height)
         })
+        ctx.restore()
 
         //draw line up and bottom
         ctx.fillRect(0, this.top, this.width, 1)
         ctx.fillRect(0, this.bottom, this.width, 1)
 
     }
-    constructor(public gosRef: MutableRefObject<GameObject[]>) {
+    constructor(public gosRef: MutableRefObject<GameObject[]>, protected player: GameObject) {
 
     }
     setSize(width: number, height: number) {
@@ -110,10 +116,19 @@ export class Game {
         this.draw(ctx, gos)
         this.gosRef.current = gos
 
+
     }
     protected onPlayerCollide(player: GameObject, go: GameObject) {
         //player.collisionOff = true
-        
+        player.state = 'wait'
+        player.velocity.y=0
+        setTimeout(() => {
+            player.state = "review"
+            setTimeout(() => {
+                player.state = 'normal'
+            }, 2000);
+        }, 2000);
+
     }
     protected onPlayerOutOfArea(player: GameObject) {
 
