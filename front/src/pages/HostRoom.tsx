@@ -57,27 +57,26 @@ export default function HostRoom() {
             roomID: roomID
         } as Player
     }
-    function makeGo() {
-        return {
-            id: Utils.generateID(),
-            color: Utils.getRandomColor(),
-            x: Math.random() * 400,
-            y: Math.random() * 200,
-            key: "",
-            keyState: "up"
-        } as GameObject
+    function makePlayerGo() {
+        const go = new GameObject()
+        go.id = Utils.generateID()
+        go.color = Utils.getRandomColor()
+        go.position = { x: Math.random() * 150, y: 200 }
+        go.velocity.x=100
+        go.tag = "player"
+        return go
     }
     function initGame() {
         const gos = Array<GameObject>()
         const map = new Map<string, GameObject>()
-        const go=makeGo()
+        const go = makePlayerGo()
         gos.push(go)
         if (player) {
             map.set(player.id, go)
         }
         //add player gameObject and set in map
         players.forEach((player) => {
-            const go=makeGo()
+            const go = makePlayerGo()
             gos.push(go)
             map.set(player.id, go)
         })

@@ -13,7 +13,7 @@ export default function JoinGame(props: GameProps) {
         //draw all game objects
         props.gosRef.current.forEach((go) => {
             ctx.fillStyle = go.color
-            ctx.fillRect(go.x, go.y, 50, 50)
+            ctx.fillRect(go.position.x, go.position.y, go.width,go.height)
         })
     }
     function sendAction(type: ActionType, data: any) {

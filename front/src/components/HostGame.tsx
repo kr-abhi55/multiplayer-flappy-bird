@@ -11,33 +11,48 @@ export interface GameProps {
     go: GameObject
 }
 const speed = 500
+
 export default function HostGame(props: GameProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null)
-    function onDraw(ctx: CanvasRenderingContext2D,dt:number) {
+    function onDraw(ctx: CanvasRenderingContext2D, dt: number) {
         //draw all game objects
         const gos = props.gosRef.current
 
         gos.forEach((go) => {
-            if (go.keyState == "down") {
-                if (go.key == "ArrowLeft") {
-                    go.x -= speed*dt
-                } else if (go.key == "ArrowRight") {
-                    go.x += speed*dt
-                }
-                else if (go.key == "ArrowUp") {
-                    go.y -= speed*dt
-                } else if (go.key == "ArrowDown") {
-                    go.y += speed*dt
-                }
-            }
+
             ctx.fillStyle = go.color
-            ctx.fillRect(go.x, go.y, 50, 50)
+            ctx.fillRect(go.position.x, go.position.y, go.width, go.height)
         })
 
         props.gosRef.current = gos
     }
     function updateTick() {
         props.socket.sendMessage("go/update", props.gosRef.current)
+    }
+    function onInput() {
+        const gos = props.gosRef.current
+
+        gos.forEach((go) => {
+            if (go.key == " ") {
+                go.velocity.y=-300
+                go.key=""
+            }
+        })
+
+        props.gosRef.current = gos
+    }
+    function onPhysics(dt: number) {
+        const gos = props.gosRef.current
+        const g=9.8 //px/s
+        gos.forEach((go) => {
+            if (go.bodyType == 'dynamic' && go.tag=='player') {
+                go.velocity.y+=g
+                go.position.y+=go.velocity.y*dt
+                go.position.x+=go.velocity.x*dt
+            }
+        })
+
+        props.gosRef.current = gos
     }
     useEffect(() => {
         const canvas = canvasRef.current!;
@@ -52,13 +67,15 @@ export default function HostGame(props: GameProps) {
             canvas.height = window.innerHeight
         }
         let previousTime = 0;
-        const render = (time:number) => {
-            const dt=(time-previousTime)/1000
+        const render = (time: number) => {
+            const dt = (time - previousTime) / 1000
             context.clearRect(0, 0, canvas.width, canvas.height)
-            onDraw(context,dt)
+            onInput()
+            onPhysics(dt)
+            onDraw(context, dt)
             updateTick()
             animationFrameId = requestAnimationFrame(render)
-            previousTime=time
+            previousTime = time
         }
         animationFrameId = requestAnimationFrame(render)
         const onMove = (e: MouseEvent) => {
@@ -71,12 +88,12 @@ export default function HostGame(props: GameProps) {
             props.go.key = e.key
             props.go.keyState = "down"
         }
-        canvas.addEventListener("keydown", keyDown)
+        window.addEventListener("keydown", keyDown)
         const keyUp = (e: KeyboardEvent) => {
             props.go.key = ""
             props.go.keyState = "up"
         }
-        canvas.addEventListener("keyup", keyUp)
+        window.addEventListener("keyup", keyUp)
         canvas.addEventListener('mousemove', onMove)
         const timer = setInterval(() => {
 
@@ -93,7 +110,7 @@ export default function HostGame(props: GameProps) {
     }, [])
     return (
         <div className="full" style={{ overflow: 'hidden' }}>
-            <canvas tabIndex={1} ref={canvasRef} ></canvas>
+            <canvas  ref={canvasRef} ></canvas>
             <div className="game-panel">
                 <button onClick={props.onGameEnd}>End</button>
                 <div>
