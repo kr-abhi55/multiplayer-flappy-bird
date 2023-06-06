@@ -1,7 +1,8 @@
 
-import { MutableRefObject, Ref, useEffect, useRef } from "react";
+import { MutableRefObject, Ref, useEffect, useRef, useState } from "react";
 import { HostSocket } from "../ts/socket/HostSocket";
 import { Player, ActionType, GameObject } from "../ts/common";
+import { Game } from "../ts/Game";
 
 export interface GameProps {
     onGameEnd: () => void
@@ -14,6 +15,8 @@ const speed = 500
 
 export default function HostGame(props: GameProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null)
+    const [game, setGame] = useState<Game>()
+
     function onDraw(ctx: CanvasRenderingContext2D, dt: number) {
         //draw all game objects
         const gos = props.gosRef.current
@@ -29,31 +32,7 @@ export default function HostGame(props: GameProps) {
     function updateTick() {
         props.socket.sendMessage("go/update", props.gosRef.current)
     }
-    function onInput() {
-        const gos = props.gosRef.current
-
-        gos.forEach((go) => {
-            if (go.key == " ") {
-                go.velocity.y=-300
-                go.key=""
-            }
-        })
-
-        props.gosRef.current = gos
-    }
-    function onPhysics(dt: number) {
-        const gos = props.gosRef.current
-        const g=9.8 //px/s
-        gos.forEach((go) => {
-            if (go.bodyType == 'dynamic' && go.tag=='player') {
-                go.velocity.y+=g
-                go.position.y+=go.velocity.y*dt
-                go.position.x+=go.velocity.x*dt
-            }
-        })
-
-        props.gosRef.current = gos
-    }
+   
     useEffect(() => {
         const canvas = canvasRef.current!;
         const context = canvas.getContext('2d')!
@@ -61,18 +40,23 @@ export default function HostGame(props: GameProps) {
 
         canvas.width = window.innerWidth
         canvas.height = window.innerHeight
+        const game = new Game(props.gosRef)
+        game.setSize(canvas.width, canvas.height)
+        setGame(game)
 
         window.onresize = () => {
             canvas.width = window.innerWidth
             canvas.height = window.innerHeight
+            game.setSize(canvas.width, canvas.height)
         }
         let previousTime = 0;
         const render = (time: number) => {
             const dt = (time - previousTime) / 1000
             context.clearRect(0, 0, canvas.width, canvas.height)
-            onInput()
-            onPhysics(dt)
-            onDraw(context, dt)
+            game.update(context,dt)
+            // onInput()
+            // onPhysics(dt)
+            // onDraw(context, dt)
             updateTick()
             animationFrameId = requestAnimationFrame(render)
             previousTime = time
@@ -110,7 +94,7 @@ export default function HostGame(props: GameProps) {
     }, [])
     return (
         <div className="full" style={{ overflow: 'hidden' }}>
-            <canvas  ref={canvasRef} ></canvas>
+            <canvas ref={canvasRef} ></canvas>
             <div className="game-panel">
                 <button onClick={props.onGameEnd}>End</button>
                 <div>
