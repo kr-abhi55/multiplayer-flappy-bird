@@ -15,7 +15,8 @@ export default function JoinRoom() {
     const [player, setPlayer] = useState<Player>()
     const [socket, setSocket] = useState<JoinSocket>()
     const [players, setPlayers] = useState<Player[]>([])
-    const gosRef = useRef<GameObject[]>([])
+    const gosRef = useRef<Map<string, GameObject>>(new Map())
+    const [playerGoId, setPlayerGoId] = useState<string>()
 
     /*------------------------------*/
     const initSocket = (player: Player) => {
@@ -29,11 +30,18 @@ export default function JoinRoom() {
                 return navigate("/join")
             }
             onGoUpdate(gos: GameObject[]): void {
-                gosRef.current=gos
+                gos.forEach((go) => {
+                    gosRef.current.set(go.id, go)
+                })
             }
             onGameStart(gos: GameObject[]): void {
-
-                gosRef.current=gos
+                gosRef.current.clear()
+                gos.forEach((go) => {
+                    if (go.info.playerID == player.id) {
+                        setPlayerGoId(() => go.id)
+                    }
+                    gosRef.current.set(go.id, go)
+                })
 
                 setIsLobby(false)
             }
@@ -93,7 +101,9 @@ export default function JoinRoom() {
                 ((isLobby) ?
                     <JoinLobby players={players} player={player} />
                     :
-                    <JoinGame gosRef={gosRef} player={player} socket={socket} />
+                    playerGoId ? <JoinGame goId={playerGoId} gosRef={gosRef} player={player} socket={socket} />
+                        :
+                        <div>Player id  is {playerGoId}</div>
                 )}
         </div>
     )

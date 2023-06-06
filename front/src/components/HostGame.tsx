@@ -15,22 +15,12 @@ const speed = 500
 
 export default function HostGame(props: GameProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null)
-    const [game, setGame] = useState<Game>()
+    //const [game, setGame] = useState<Game>()
 
-    function onDraw(ctx: CanvasRenderingContext2D, dt: number) {
-        //draw all game objects
-        const gos = props.gosRef.current
-
-        gos.forEach((go) => {
-
-            ctx.fillStyle = go.color
-            ctx.fillRect(go.position.x, go.position.y, go.width, go.height)
-        })
-
-        props.gosRef.current = gos
-    }
     function updateTick() {
-        props.socket.sendMessage("go/update", props.gosRef.current)
+        //only players
+        const players = props.gosRef.current.filter((go) => go.tag == 'player')
+        props.socket.sendMessage("go/update", players)
     }
 
     useEffect(() => {
@@ -38,36 +28,27 @@ export default function HostGame(props: GameProps) {
         const context = canvas.getContext('2d')!
         let animationFrameId: number;
 
-        // canvas.width = window.innerWidth
-        // canvas.height = window.innerHeight
+        console.log(props.go.position)
         const game = new Game(props.gosRef, props.go)
         game.setSize(canvas.width, canvas.height)
-        setGame(game)
-
-        // window.onresize = () => {
-        //     canvas.width = window.innerWidth
-        //     canvas.height = window.innerHeight
-        //     game.setSize(canvas.width, canvas.height)
-        // }
         let previousTime = 0;
+        let isFirstFrame = true
         const render = (time: number) => {
+            if (isFirstFrame) {
+                isFirstFrame = false;
+                previousTime = time;
+                animationFrameId = requestAnimationFrame(render);
+                return;
+            }
             const dt = (time - previousTime) / 1000
             context.clearRect(0, 0, canvas.width, canvas.height)
             game.update(context, dt)
-            // onInput()
-            // onPhysics(dt)
-            // onDraw(context, dt)
             updateTick()
-            animationFrameId = requestAnimationFrame(render)
             previousTime = time
+            animationFrameId = requestAnimationFrame(render)
         }
         animationFrameId = requestAnimationFrame(render)
-        const onMove = (e: MouseEvent) => {
-            const x = e.offsetX
-            const y = e.offsetY
-            // console.log(x, y)
-            //send message update pos
-        }
+
         const keyDown = (e: KeyboardEvent) => {
             props.go.key = e.key
             props.go.keyState = "down"
@@ -78,18 +59,13 @@ export default function HostGame(props: GameProps) {
             props.go.keyState = "up"
         }
         window.addEventListener("keyup", keyUp)
-        canvas.addEventListener('mousemove', onMove)
-        const timer = setInterval(() => {
 
-            // console.log(props.gosRef, "gos")
-        }, 20)
         return () => {
-            clearInterval(timer)
-            canvas.removeEventListener('mousemove', onMove)
-            canvas.removeEventListener("keydown", keyDown)
-            canvas.removeEventListener("keyup", keyUp)
+            window.removeEventListener("keydown", keyDown)
+            window.removeEventListener("keyup", keyUp)
 
             cancelAnimationFrame(animationFrameId);
+
         };
     }, [])
     return (

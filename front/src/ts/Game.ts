@@ -54,7 +54,7 @@ export class Game {
                 const gameObject = gos[j];
 
                 // Skip the player object itself
-                if (player === gameObject) {
+                if (player === gameObject || gameObject.tag == 'player') {
                     continue;
                 }
 
@@ -69,10 +69,20 @@ export class Game {
         }
 
     }
+    private checkOutOfArea(gos: GameObject[]) {
+        const players = gos.filter((go) => go.tag == 'player')
+        for (let i = 0; i < players.length; i++) {
+            const player = players[i];
+            if (player.state != 'normal') continue
+            if (player.position.y < 0 || player.position.y > this.height) {
+                this.onPlayerOutOfArea(player)
+            }
+        }
+    }
     private physics(dt: number, gos: GameObject[]) {
         const g = 9.8 //px/s
         gos.forEach((go) => {
-            if (  go.bodyType == 'dynamic' && go.tag == 'player' && go.state != 'wait') {
+            if (go.bodyType == 'dynamic' && go.tag == 'player' && go.state != 'wait') {
                 go.velocity.y += g
                 go.position.y += go.velocity.y * dt
                 go.position.x += go.velocity.x * dt
@@ -112,25 +122,31 @@ export class Game {
         const gos = this.gosRef.current
         this.input(gos)
         this.physics(dt, gos)
+        this.checkOutOfArea(gos)
         this.collision(gos)
         this.draw(ctx, gos)
         this.gosRef.current = gos
 
 
     }
-    protected onPlayerCollide(player: GameObject, go: GameObject) {
-        //player.collisionOff = true
+    private revivePlayer(player: GameObject) {
         player.state = 'wait'
-        player.velocity.y=0
+        player.velocity.y = 0
         setTimeout(() => {
+            player.position.y = 200
             player.state = "review"
             setTimeout(() => {
                 player.state = 'normal'
             }, 2000);
         }, 2000);
+    }
+    protected onPlayerCollide(player: GameObject, go: GameObject) {
+        //player.collisionOff = true
+        this.revivePlayer(player)
 
     }
     protected onPlayerOutOfArea(player: GameObject) {
+        this.revivePlayer(player)
 
     }
 

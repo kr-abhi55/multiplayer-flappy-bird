@@ -94,11 +94,11 @@ export default function HostRoom() {
         const gos = [...genWall()]
         const map = new Map<string, GameObject>()
         if (player) {
+            //add player gameObject and set in map
             const go = makePlayerGo(player.id)
             gos.push(go)
             map.set(player.id, go)
         }
-        //add player gameObject and set in map
         players.forEach((player) => {
             const go = makePlayerGo(player.id)
             gos.push(go)

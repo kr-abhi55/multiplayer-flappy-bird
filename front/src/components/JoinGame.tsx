@@ -1,60 +1,61 @@
 import { MutableRefObject, useEffect, useRef } from "react";
-import { GameObject, Player, ActionType } from "../ts/common";
+import { GameObject, Player, ActionType, Point } from "../ts/common";
 import { JoinSocket } from "../ts/socket/JoinSocket";
 
 export interface GameProps {
-    gosRef: MutableRefObject<GameObject[]>
+    gosRef: React.MutableRefObject<Map<string, GameObject>>
     player: Player
     socket: JoinSocket
+    goId: string
+
+
 }
 export default function JoinGame(props: GameProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null)
     function onDraw(ctx: CanvasRenderingContext2D) {
+        const diff = playerGO().position.x - ctx.canvas.width * 0.5
+        const offset: Point = {
+            x: diff > 0 ? diff : 0,
+            y: 0
+        }
+        ctx.save()
+        ctx.translate(-offset.x, offset.y)
         //draw all game objects
         props.gosRef.current.forEach((go) => {
             ctx.fillStyle = go.color
-            ctx.fillRect(go.position.x, go.position.y, go.width,go.height)
+            ctx.fillRect(go.position.x, go.position.y, go.width, go.height)
         })
+        ctx.restore()
     }
     function sendAction(type: ActionType, data: any) {
         props.socket.sendAction(type, data)
     }
 
+    function playerGO() {
+        return props.gosRef.current.get(props.goId)!
+    }
 
     useEffect(() => {
         const canvas = canvasRef.current!;
         const context = canvas.getContext('2d')!
         let animationFrameId: number;
 
-        canvas.width = window.innerWidth
-        canvas.height = window.innerHeight
-
-        window.onresize = () => {
-            canvas.width = window.innerWidth
-            canvas.height = window.innerHeight
-        }
         const render = () => {
             context.clearRect(0, 0, canvas.width, canvas.height)
             onDraw(context)
             animationFrameId = requestAnimationFrame(render)
         }
         animationFrameId = requestAnimationFrame(render)
-        const onMove = (e: MouseEvent) => {
-            const x = e.offsetX
-            const y = e.offsetY
-            // console.log(x, y)
-            // sendAction("set_pos", { x, y })
-            //send message update pos
-        }
-        canvas.addEventListener('mousemove', onMove)
+
         const keyDown = (e: KeyboardEvent) => {
             sendAction("key", {
                 playerID: props.player.id,
                 key: e.key,
                 keyState: "down"
             })
+
         }
-        canvas.addEventListener("keydown", keyDown)
+        window.addEventListener("keydown", keyDown)
         const keyUp = (e: KeyboardEvent) => {
             sendAction("key", {
                 playerID: props.player.id,
@@ -62,17 +63,16 @@ export default function JoinGame(props: GameProps) {
                 keyState: "up"
             })
         }
-        canvas.addEventListener("keyup", keyUp)
+        window.addEventListener("keyup", keyUp)
         return () => {
-            canvas.removeEventListener('mousemove', onMove)
             cancelAnimationFrame(animationFrameId);
-            canvas.removeEventListener("keydown", keyDown)
-            canvas.removeEventListener("keyup", keyUp)
+            window.removeEventListener("keydown", keyDown)
+            window.removeEventListener("keyup", keyUp)
         };
     }, [])
     return (
-        <div className="full" style={{ overflow: 'hidden' }}>
-            <canvas tabIndex={1} ref={canvasRef} ></canvas>
+        <div className="full center" style={{ overflow: 'hidden' }}>
+            <canvas width={500} height={400} ref={canvasRef} ></canvas>
             <div className="game-panel">
                 <div>
                     {props.player.name}
