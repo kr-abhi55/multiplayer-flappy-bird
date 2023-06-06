@@ -38,17 +38,17 @@ export default function HostGame(props: GameProps) {
         const context = canvas.getContext('2d')!
         let animationFrameId: number;
 
-        canvas.width = window.innerWidth
-        canvas.height = window.innerHeight
+        // canvas.width = window.innerWidth
+        // canvas.height = window.innerHeight
         const game = new Game(props.gosRef)
         game.setSize(canvas.width, canvas.height)
         setGame(game)
 
-        window.onresize = () => {
-            canvas.width = window.innerWidth
-            canvas.height = window.innerHeight
-            game.setSize(canvas.width, canvas.height)
-        }
+        // window.onresize = () => {
+        //     canvas.width = window.innerWidth
+        //     canvas.height = window.innerHeight
+        //     game.setSize(canvas.width, canvas.height)
+        // }
         let previousTime = 0;
         const render = (time: number) => {
             const dt = (time - previousTime) / 1000
@@ -93,8 +93,8 @@ export default function HostGame(props: GameProps) {
         };
     }, [])
     return (
-        <div className="full" style={{ overflow: 'hidden' }}>
-            <canvas ref={canvasRef} ></canvas>
+        <div className="full center" style={{ overflow: 'hidden' }}>
+            <canvas width={500} height={400} ref={canvasRef} ></canvas>
             <div className="game-panel">
                 <button onClick={props.onGameEnd}>End</button>
                 <div>

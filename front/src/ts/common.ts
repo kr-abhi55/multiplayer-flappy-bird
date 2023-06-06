@@ -26,6 +26,8 @@ export class GameObject {
     keyState: "up" | "down" = "up"
     bodyType: "dynamic" | "static" = "dynamic"
     tag: "wall" | "player" = "player"
-    pausePhysics=false
+    physicsOff=false
+    collisionOff=false
+    info:any={}
 
 }

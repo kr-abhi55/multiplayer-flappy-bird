@@ -23,6 +23,9 @@ export namespace Utils {
     export function generateID() {
         return uuid4()
     }
+    export function randRange(min: number, max: number) {
+        return min + Math.random() * (max - min)
+    }
     export function getRandomColor() {
         var letters = '0123456789ABCDEF';
         var color = '#';

@@ -57,26 +57,50 @@ export default function HostRoom() {
             roomID: roomID
         } as Player
     }
-    function makePlayerGo() {
+    function makePlayerGo(id: string) {
         const go = new GameObject()
         go.id = Utils.generateID()
+        go.width = 25
+        go.height = 25
         go.color = Utils.getRandomColor()
-        go.position = { x: Math.random() * 150, y: 200 }
-        go.velocity.x=100
+        go.position = { x: Math.random() * 50, y: 100 }
+        go.velocity.x = 100
         go.tag = "player"
+        go.info.playerID = id
         return go
     }
+    function genWall() {
+        const walls: GameObject[] = []
+        let nextX = 200
+        for (let i = 0; i < 100; i++) {
+            const go = new GameObject()
+            go.id = Utils.generateID()
+            go.width = 25
+            go.height = Utils.randRange(150, 250)
+            go.color = Utils.getRandomColor()
+            if (i % 2 == 0) {
+                go.position = { x: nextX, y: 400 - go.height }
+            } else {
+                go.position = { x: nextX, y: 0 }
+            }
+            go.tag = "wall"
+            go.bodyType = "static"
+            nextX += 120
+            walls.push(go)
+        }
+        return walls
+    }
     function initGame() {
-        const gos = Array<GameObject>()
+        const gos = [...genWall()]
         const map = new Map<string, GameObject>()
-        const go = makePlayerGo()
-        gos.push(go)
         if (player) {
+            const go = makePlayerGo(player.id)
+            gos.push(go)
             map.set(player.id, go)
         }
         //add player gameObject and set in map
         players.forEach((player) => {
-            const go = makePlayerGo()
+            const go = makePlayerGo(player.id)
             gos.push(go)
             map.set(player.id, go)
         })
